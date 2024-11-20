@@ -1,5 +1,6 @@
-- hosts: all
-  become: true
+- name: Install NGINX
+  hosts: all
+  become: yes
   tasks:
     - name: Add EPEL repository for RHEL/CentOS
       yum:
