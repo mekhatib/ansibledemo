@@ -1,20 +1,28 @@
-
-- name: Install nginx
-  hosts: all
+- hosts: all
   become: true
-
   tasks:
-  - name: Add epel-release repo
-    yum:
-      name: epel-release
-      state: present
+    - name: Add EPEL repository for RHEL/CentOS
+      yum:
+        name: epel-release
+        state: present
+      when: ansible_distribution in ["CentOS", "RedHat"] and ansible_distribution_major_version | int < 9
 
-  - name: Install nginx
-    yum:
-      name: nginx
-      state: present
+    - name: Enable EPEL for Amazon Linux
+      command: amazon-linux-extras enable epel
+      when: ansible_distribution == "Amazon"
 
-  - name: Insert Index Page
+    - name: Update package cache
+      yum:
+        name: "*"
+        state: latest
+      when: ansible_os_family == "RedHat"
+
+    - name: Install Nginx
+      yum:
+        name: nginx
+        state: present
+
+ - name: Insert Index Page
     template:
       src: index.html
       dest: /usr/share/nginx/html/index.html
